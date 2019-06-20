@@ -2,7 +2,7 @@
   "$schema": "@angular-devkit/architect/src/builders-schema.json",
   "builders": {
     "cli-panel": {
-      "class": "./cli-panel.builder.js",
+      "implementation": "./cli-panel.js",
       "schema": "./schema.json",
       "description": "Add description later"
     }

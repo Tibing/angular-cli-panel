@@ -3,17 +3,5 @@
   "title": "Cli Panel builder",
   "description": "Cli Panel builder options",
   "properties": {
-    "properties": {
-      "format": {
-        "type": "string",
-        "description": "Timestamp format",
-        "default": "dd/mm/yyyy"
-      },
-      "path": {
-        "type": "string",
-        "description": "Path to the timestamp file",
-        "default": "./timestamp"
-      }
-    }
   }
 }
