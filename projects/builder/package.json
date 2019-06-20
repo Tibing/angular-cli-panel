@@ -1,5 +1,5 @@
 {
-  "name": "cli-panel",
+  "name": "@cli-panel/builder",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

@@ -21,7 +21,7 @@
     ]
   },
   "include": [
-    "projects/cli-panel/**/*.ts",
-    "projects/cli-panel/**/*.json"
+    "projects/builder/**/*.ts",
+    "projects/builder/**/*.json"
   ]
 }

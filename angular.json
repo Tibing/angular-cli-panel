@@ -11,7 +11,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "cli-panel:cli-panel",
+          "builder": "@cli-panel/builder:builder",
           "options": {
             "outputPath": "dist/demo",
             "index": "projects/demo/src/index.html",
@@ -56,7 +56,7 @@
           }
         },
         "serve": {
-          "builder": "cli-panel:cli-panel",
+          "builder": "@cli-panel/builder:builder",
           "options": {
             "browserTarget": "demo:build"
           },
