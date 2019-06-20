@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TerminalModule } from 'platform-terminal';
 
 import { AppComponent } from './app.component';
+import { Server } from './data/server';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,7 @@ import { AppComponent } from './app.component';
     TerminalModule,
     CommonModule,
   ],
-  providers: [],
+  providers: [Server],
   bootstrap: [AppComponent],
 })
 export class AppModule {
