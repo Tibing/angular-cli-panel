@@ -7,6 +7,7 @@ enum ActionType {
   PROGRESS = 'progress',
   STATUS = 'status',
   OPERATIONS = 'operations',
+  SIZES = 'sizes',
 }
 
 interface Action {
@@ -20,7 +21,7 @@ export class Server {
   private progress = new Subject<number>();
   readonly progress$: Observable<number> = this.progress.asObservable()
     .pipe(
-      map(val => val * 100),
+      map(val => Math.round(val * 100)),
       distinctUntilChanged(),
     );
 
@@ -29,6 +30,16 @@ export class Server {
 
   private operations = new Subject<string>();
   readonly operations$: Observable<string> = this.operations.asObservable().pipe(distinctUntilChanged());
+
+  private bundleSize = new Subject<number>();
+  readonly bundleSize$: Observable<number> = this.bundleSize.asObservable()
+    .pipe(
+      map((value: any) => value && value.meta && value.meta.full),
+      distinctUntilChanged(),
+    );
+
+  private notImplemented = new Subject<string>();
+  readonly notImplemented$: Observable<string> = this.notImplemented.asObservable().pipe(distinctUntilChanged());
 
   constructor() {
     const port = 9838;
@@ -50,7 +61,9 @@ export class Server {
     for (const action of actions) {
       const dispatcher: Subject<any> = this.getDispatcher(action);
 
-      if (dispatcher) {
+      if (dispatcher === this.notImplemented) {
+        dispatcher.next(action);
+      } else {
         dispatcher.next(action.value);
       }
     }
@@ -64,6 +77,10 @@ export class Server {
         return this.progress;
       case ActionType.STATUS:
         return this.status;
+      case ActionType.SIZES:
+        return this.bundleSize;
+      default:
+        return this.notImplemented;
     }
   }
 }
