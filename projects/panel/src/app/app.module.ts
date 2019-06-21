@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TerminalModule } from 'platform-terminal';
 
@@ -15,6 +15,7 @@ import { Server } from './data/server';
   ],
   providers: [Server],
   bootstrap: [AppComponent],
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export class AppModule {
 }
