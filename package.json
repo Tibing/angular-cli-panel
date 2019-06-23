@@ -22,6 +22,7 @@
     "@angular/platform-browser": "~8.0.0",
     "@angular/platform-browser-dynamic": "~8.0.0",
     "@angular/router": "~8.0.0",
+    "filesize": "^4.1.2",
     "platform-terminal": "0.0.1",
     "rxjs": "~6.4.0",
     "socket.io": "^2.2.0",

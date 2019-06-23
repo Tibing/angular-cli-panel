@@ -1,33 +1,55 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { EventBus } from './data/event-bus';
+import { map, startWith } from 'rxjs/operators';
+
+interface TableData {
+  headers: string[];
+  data: string[][];
+}
 
 @Component({
   selector: 'app-root',
   template: `
-    <box>
-      Operations {{ operations$ | async }}
-    </box>
+    <grid rows="12" cols="12">
 
-    <box top="1">
-      Status {{ status$ | async }}
-    </box>
+      <table
+        [row]="6"
+        [col]="0"
+        [rowSpan]="6"
+        [colSpan]="6"
+        [label]="'Modules'"
+        [columnWidth]="[20, 5, 10]"
+        [keys]="true"
+        [data]="modules$ |async">
+      </table>
 
-    <box top="2">
-      Progress {{ progress$ | async }}%
-    </box>
+      <table
+        [row]="6"
+        [col]="6"
+        [rowSpan]="6"
+        [colSpan]="6"
+        [label]="'Assets'"
+        [columnWidth]="[30, 10]"
+        [keys]="true"
+        [data]="assets$ |async">
+      </table>
 
-    <box top="3">
-      Bundle Size {{ bundleSize$ | async }}Kb
-    </box>
+      <progressbar></progressbar>
+
+    </grid>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  progress$: Observable<number> = this.eventBus.progress$;
-  status$: Observable<string> = this.eventBus.status$;
-  operations$: Observable<string> = this.eventBus.operations$;
-  bundleSize$: Observable<number> = this.eventBus.bundleSize$;
+  modules$: Observable<TableData> = this.eventBus.modules$.pipe(
+    startWith([]),
+    map((data: string[][]) => ({ headers: ['Name', 'Size', 'Percent'], data })),
+  );
+  assets$: Observable<TableData> = this.eventBus.assets$.pipe(
+    startWith([]),
+    map((data: string[][]) => ({ headers: ['Name', 'Size'], data })),
+  );
 
   constructor(private eventBus: EventBus) {
   }
