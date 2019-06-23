@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Server } from './data/server';
+import { EventBus } from './data/event-bus';
 
 @Component({
   selector: 'app-root',
@@ -24,11 +24,11 @@ import { Server } from './data/server';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  progress$: Observable<number> = this.server.progress$;
-  status$: Observable<string> = this.server.status$;
-  operations$: Observable<string> = this.server.operations$;
-  bundleSize$: Observable<number> = this.server.bundleSize$;
+  progress$: Observable<number> = this.eventBus.progress$;
+  status$: Observable<string> = this.eventBus.status$;
+  operations$: Observable<string> = this.eventBus.operations$;
+  bundleSize$: Observable<number> = this.eventBus.bundleSize$;
 
-  constructor(private server: Server) {
+  constructor(private eventBus: EventBus) {
   }
 }

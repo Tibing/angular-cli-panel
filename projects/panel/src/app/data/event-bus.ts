@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import * as SocketIO from 'socket.io';
 import { Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+
+import { Action, SocketManager } from './socket-manager';
 
 enum ActionType {
   PROGRESS = 'progress',
@@ -10,13 +11,8 @@ enum ActionType {
   SIZES = 'sizes',
 }
 
-interface Action {
-  type: string;
-  value: any;
-}
-
 @Injectable()
-export class Server {
+export class EventBus {
 
   private progress = new Subject<number>();
   readonly progress$: Observable<number> = this.progress.asObservable()
@@ -41,31 +37,17 @@ export class Server {
   private notImplemented = new Subject<string>();
   readonly notImplemented$: Observable<string> = this.notImplemented.asObservable().pipe(distinctUntilChanged());
 
-  constructor() {
-    const port = 9838;
-    const server = SocketIO(port);
-
-    server.on('error', err => {
-      // eslint-disable-next-line no-console
-      console.log(err);
-    });
-
-    server.on('connection', socket => {
-      socket.on('message', (message, ack) => {
-        this.dispatchAction(message);
-      });
-    });
+  constructor(private socketManager: SocketManager) {
+    socketManager.actions$.subscribe((action: Action) => this.dispatchAction(action));
   }
 
-  private dispatchAction(actions: Action[]) {
-    for (const action of actions) {
-      const dispatcher: Subject<any> = this.getDispatcher(action);
+  private dispatchAction(action: Action) {
+    const dispatcher: Subject<any> = this.getDispatcher(action);
 
-      if (dispatcher === this.notImplemented) {
-        dispatcher.next(action);
-      } else {
-        dispatcher.next(action.value);
-      }
+    if (dispatcher === this.notImplemented) {
+      dispatcher.next(action);
+    } else {
+      dispatcher.next(action.value);
     }
   }
 

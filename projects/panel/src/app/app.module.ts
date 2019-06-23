@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { TerminalModule } from 'platform-terminal';
 
 import { AppComponent } from './app.component';
-import { Server } from './data/server';
+import { EventBus } from './data/event-bus';
+import { SocketManager } from './data/socket-manager';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,7 @@ import { Server } from './data/server';
     TerminalModule,
     CommonModule,
   ],
-  providers: [Server],
+  providers: [EventBus, SocketManager],
   bootstrap: [AppComponent],
   schemas: [NO_ERRORS_SCHEMA],
 })
