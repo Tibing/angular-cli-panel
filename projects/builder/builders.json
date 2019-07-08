@@ -1,9 +1,9 @@
 {
   "$schema": "@angular-devkit/architect/src/builders-schema.json",
   "builders": {
-    "builder": {
-      "implementation": "./builder.js",
-      "schema": "./schema.json",
+    "browser": {
+      "implementation": "./browser/index.js",
+      "schema": "../../@angular-devkit/build-angular/src/browser/schema.json",
       "description": "Add description later"
     }
   }
