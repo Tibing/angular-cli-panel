@@ -11,8 +11,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@cli-panel/builder:builder",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "customWebpackConfig": {
+              "path": "./projects/demo/webpack.config.js"
+            },
             "outputPath": "dist/demo",
             "index": "projects/demo/src/index.html",
             "main": "projects/demo/src/main.ts",
@@ -56,8 +59,11 @@
           }
         },
         "serve": {
-          "builder": "@cli-panel/builder:builder",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
+            "customWebpackConfig": {
+              "path": "./projects/demo/webpack.config.js",
+            },
             "browserTarget": "demo:build"
           },
           "configurations": {
