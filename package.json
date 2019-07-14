@@ -10,7 +10,8 @@
     "link:panel": "npm link dist/projects/panel && npm link @cli-panel/panel",
     "debug:panel": "npm run build && node --inspect-brk dist/src/main.js",
     "start:demo": "ng serve demo",
-    "build:demo": "ng build demo"
+    "build:demo": "ng build demo",
+    "start:test-plugin-server": "node projects/plugin/test-server.js"
   },
   "private": true,
   "dependencies": {
@@ -24,6 +25,8 @@
     "@angular/router": "~8.0.0",
     "platform-terminal": "0.0.1",
     "rxjs": "~6.4.0",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"
   },
