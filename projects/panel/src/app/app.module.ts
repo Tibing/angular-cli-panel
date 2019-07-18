@@ -4,6 +4,7 @@ import { TerminalModule } from 'platform-terminal';
 
 import { AppComponent } from './app.component';
 import { Socket } from './data/socket';
+import { DataFacade } from './data/data.facade';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,10 @@ import { Socket } from './data/socket';
     TerminalModule,
     CommonModule,
   ],
-  providers: [Socket],
+  providers: [
+    Socket,
+    DataFacade,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {

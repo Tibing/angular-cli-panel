@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+import { DataFacade } from './data/data.facade';
 
 @Component({
   selector: 'app-root',
-  template: `Bundling {{ counter$ | async }}%`,
+  template: `Bundling {{ progress$ | async }}%`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  counter$: Observable<number> = of(1);
+  progress$: Observable<number> = this.dataFacade.progress$.pipe(
+    tap(() => this.cd.detectChanges()),
+  );
+
+  constructor(private dataFacade: DataFacade,
+              private cd: ChangeDetectorRef) {
+  }
 }
