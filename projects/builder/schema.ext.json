@@ -1,0 +1,9 @@
+{
+  "properties": {
+    "raw": {
+      "type": "boolean",
+      "description": "Disables CLI Panel and shows raw log.",
+      "default": false
+    }
+  }
+}

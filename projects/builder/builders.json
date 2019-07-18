@@ -1,10 +1,15 @@
 {
   "$schema": "@angular-devkit/architect/src/builders-schema.json",
   "builders": {
-    "builder": {
-      "implementation": "./builder.js",
-      "schema": "./schema.json",
-      "description": "Add description later"
+    "browser": {
+      "implementation": "./browser/index.js",
+      "schema": "./browser/schema.json",
+      "description": "Cli Panel Browser Builder"
+    },
+    "dev-server": {
+      "implementation": "./dev-server/index.js",
+      "schema": "./dev-server/schema.json",
+      "description": "Cli Panel Dev Server Builder"
     }
   }
 }

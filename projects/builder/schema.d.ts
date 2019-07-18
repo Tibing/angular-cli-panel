@@ -1,3 +1,3 @@
-// @ts-ignore
 export interface CliPanelBuilderSchema {
+  raw: boolean;
 }

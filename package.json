@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "build:builder": "tsc -p tsconfig.builder.json",
-    "link:builder": "npm link dist/cli-panel && npm link @cli-panel/builder",
+    "build:all": "run-s build:panel link:panel build:builder link:builder",
+    "build:builder": "tsc -p tsconfig.builder.json && ts-node scripts/merge-schemes.ts",
+    "link:builder": "npm link dist/builder && npm link @cli-panel/builder",
     "start:panel": "npm run build:panel && node dist/projects/panel/src/main.js",
     "build:panel": "ngc -p projects/panel/tsconfig.app.json",
     "link:panel": "npm link dist/projects/panel && npm link @cli-panel/panel",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@angular-devkit/architect": "^0.800.3",
     "@angular-devkit/build-angular": "~0.800.0",
+    "@angular-devkit/build-ng-packagr": "~0.800.0",
     "@angular-devkit/core": "^8.0.3",
     "@angular/cli": "~8.0.1",
     "@angular/compiler-cli": "~8.0.0",
@@ -47,8 +49,11 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
+    "ng-packagr": "^5.1.0",
+    "npm-run-all": "^4.1.5",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
+    "tsickle": "^0.35.0",
     "tslint": "~5.15.0",
     "typescript": "~3.4.3"
   }
