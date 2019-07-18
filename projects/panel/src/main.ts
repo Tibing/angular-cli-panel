@@ -1,15 +1,18 @@
 import { platformTerminalDynamic } from 'platform-terminal';
-import { enableProdMode, NgModuleRef } from '@angular/core';
+import { enableProdMode, NgModuleRef, StaticProvider } from '@angular/core';
 import { from, Observable } from 'rxjs';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { EVENT_BUS } from './app/event-bus';
 
-export function bootstrapPanel(): Observable<NgModuleRef<AppModule>> {
+export function bootstrapPanel(eventBus: Observable<any>): Observable<NgModuleRef<AppModule>> {
 
   if (environment.production) {
     enableProdMode();
   }
 
-  return from(platformTerminalDynamic().bootstrapModule(AppModule));
+  const providers: StaticProvider[] = [{ provide: EVENT_BUS, useValue: eventBus }];
+
+  return from(platformTerminalDynamic(providers).bootstrapModule(AppModule));
 }

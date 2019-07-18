@@ -2,8 +2,8 @@ import { ExecutionTransformer } from '@angular-devkit/build-angular';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { BuilderContext } from '@angular-devkit/architect';
 import * as webpack from 'webpack';
-import { NEVER, Observable } from 'rxjs';
-import { bootstrapPanel } from '@cli-panel/panel';
+import { NEVER, Observable, Subject } from 'rxjs';
+import { bootstrapPanel, Event } from '@cli-panel/panel';
 
 import { WebpackDataPlugin } from './webpack-data-plugin';
 import { CliPanelBuilderSchema } from './schema';
@@ -31,28 +31,31 @@ function executeBuilderWithPanel<T extends CliPanelBuilderSchema, R>(
   builder: Builder<T, R>, rawOptions: T, context: BuilderContext,
   rawTransforms?: BuilderTransforms): Observable<R> {
 
-  bootstrapPanel();
+  const eventBus = new Subject<Event>();
+  bootstrapPanel(eventBus.asObservable());
 
   const options = { ...rawOptions, progress: false };
   const transforms = {
     ...rawTransforms,
-    webpackConfiguration: webpackConfigTransformer,
+    webpackConfiguration: webpackConfigTransformer(eventBus),
     logging: noop,
   };
 
   builder(options, context, transforms)
-    .subscribe(noop);
+    .subscribe();
 
   return NEVER;
 }
 
-function webpackConfigTransformer(config: webpack.Configuration): ExecutionTransformer<webpack.Configuration> {
-  return {
-    ...config,
-    plugins: [
-      ...config.plugins,
-      new WebpackDataPlugin(),
-    ],
+function webpackConfigTransformer(eventBus: Subject<Event>): ExecutionTransformer<webpack.Configuration> {
+  return (config: webpack.Configuration) => {
+    return {
+      ...config,
+      plugins: [
+        ...config.plugins,
+        new WebpackDataPlugin(eventBus),
+      ],
+    };
   };
 }
 

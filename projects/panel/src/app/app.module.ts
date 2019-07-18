@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TerminalModule } from 'platform-terminal';
 
 import { AppComponent } from './app.component';
+import { Socket } from './data/socket';
 
 @NgModule({
   declarations: [
@@ -12,8 +13,11 @@ import { AppComponent } from './app.component';
     TerminalModule,
     CommonModule,
   ],
-  providers: [],
+  providers: [Socket],
   bootstrap: [AppComponent],
 })
 export class AppModule {
+
+  constructor(socket: Socket) {
+  }
 }
