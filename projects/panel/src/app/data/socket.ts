@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@angular/core';
+import { ApplicationRef, Inject, Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 import { Event, EVENT_BUS, EventBus } from '../event-bus';
-import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class Socket {
@@ -9,7 +9,8 @@ export class Socket {
   private progress = new Subject<number>();
   progress$: Observable<number> = this.progress.asObservable();
 
-  constructor(@Inject(EVENT_BUS) eventBus: EventBus) {
+  constructor(@Inject(EVENT_BUS) eventBus: EventBus,
+              private appRef: ApplicationRef) {
     eventBus.subscribe((event: Event) => this.persistEvent(event));
   }
 
@@ -19,6 +20,8 @@ export class Socket {
     if (handler) {
       handler.next(event.value);
     }
+
+    this.appRef.tick();
   }
 
   private resolveHandler(type: string): Subject<any> {
