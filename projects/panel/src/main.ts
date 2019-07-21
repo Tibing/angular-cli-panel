@@ -4,7 +4,7 @@ import { from, Observable } from 'rxjs';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import { EVENT_BUS } from './app/event-bus';
+import { EventBus } from './app/event-bus';
 
 export function bootstrapPanel(eventBus: Observable<any>): Observable<NgModuleRef<AppModule>> {
 
@@ -12,7 +12,7 @@ export function bootstrapPanel(eventBus: Observable<any>): Observable<NgModuleRe
     enableProdMode();
   }
 
-  const providers: StaticProvider[] = [{ provide: EVENT_BUS, useValue: eventBus }];
+  const providers: StaticProvider[] = [{ provide: EventBus, useValue: eventBus }];
 
   return from(platformTerminalDynamic(providers).bootstrapModule(AppModule));
 }
