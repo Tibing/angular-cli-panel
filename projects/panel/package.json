@@ -1,12 +1,11 @@
 {
   "name": "@cli-panel/panel",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "./src/main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "peerDependencies": {
+    "@angular/cdk": "^8.1.1",
+    "@angular/core": "~8.0.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "schematics": "./schematics/collection.json"
 }
