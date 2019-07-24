@@ -1,12 +1,7 @@
 import { Subject } from 'rxjs';
 import { ProgressPlugin } from 'webpack';
 
-// import { Event } from '@cli-panel/panel';
-
-interface Event {
-  type: string;
-  payload: any;
-}
+import { Event } from '@cli-panel/panel';
 
 export class WebpackDataPlugin {
 
@@ -14,41 +9,80 @@ export class WebpackDataPlugin {
   }
 
   apply(compiler) {
-    new ProgressPlugin((percent: number, info: string, ...args) => {
 
-      this.sendData({
-        type: 'progress',
-        payload: { percent, info, additional: args },
-      });
+    new ProgressPlugin((percentage, msg, ...args) => {
+      this.sendData([
+        {
+          type: 'status',
+          payload: 'compiling'
+        },
+        {
+          type: 'progress',
+          payload: {
+            percentage,
+            msg,
+            info: args,
+          }
+        }
+      ]);
     })
       .apply(compiler);
 
-    compiler.hooks.run.tapAsync('PanelPlugin', (done) => {
-      // this.sendData('RUN');
-      done();
+    compiler.hooks.compile.tap('WebpackDataPlugin', () => {
+      this.sendData([{
+        type: 'status',
+        payload: 'compiling'
+      }]);
     });
 
-    compiler.hooks.compile.tap('PanelPlugin', () => {
-      // this.sendData('COMPILING');
+    compiler.hooks.invalid.tap('WebpackDataPlugin', () => {
+      this.sendData([
+        {
+          type: 'status',
+          payload: 'invalidated'
+        },
+        {
+          type: 'progress',
+          payload: {
+            percentage: 0,
+          }
+        },
+      ]);
     });
 
-    compiler.hooks.invalid.tap('PanelPlugin', () => {
-      // this.sendData('INVALID');
+    compiler.hooks.failed.tap('WebpackDataPlugin', () => {
+      this.sendData([
+        {
+          type: 'status',
+          payload: 'failed'
+        },
+      ]);
     });
 
-    compiler.hooks.failed.tap('PanelPlugin', () => {
-      // this.sendData('FAILED');
+    compiler.hooks.done.tapAsync('WebpackDataPlugin', (stats) => {
+      this.sendData([
+        {
+          type: 'stats',
+          payload: stats.toJson(),
+        },
+        {
+          type: 'status',
+          payload: 'success',
+        },
+        {
+          type: 'progress',
+          payload: {
+            percentage: 1,
+          }
+        },
+      ]);
     });
-
-    compiler.hooks.done.tapAsync('PanelPlugin', (stats) => {
-      // this.sendData(`DONE in ${stats.endTime - stats.startTime}ms`);
-      // this.sendData(`ERRORS=[${stats.compilation.errors}]`);
-      // this.sendData(`WARNINGS=[${stats.compilation.warnings}]`);
-    });
-
   }
 
-  sendData(event: Event) {
-    this.eventBus.next(event);
+
+  sendData(eventList: Event[]) {
+    for (const event of eventList) {
+      this.eventBus.next(event);
+    }
   }
 }
