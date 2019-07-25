@@ -2,7 +2,7 @@
   "name": "@cli-panel/panel",
   "version": "0.0.1",
   "description": "",
-  "main": "./src/main.js",
+  "main": "./main.js",
   "peerDependencies": {
     "@angular/cdk": "^8.1.1",
     "@angular/core": "~8.0.0"

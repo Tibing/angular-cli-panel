@@ -8,7 +8,7 @@
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./dist/projects/panel/schematics",
+    "outDir": "./dist/panel",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
@@ -26,6 +26,7 @@
     ]
   },
   "include": [
+    "./projects/panel/package.json",
     "./projects/panel/schematics/**/*.ts",
     "./projects/panel/schematics/**/*.json"
   ],

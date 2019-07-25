@@ -1,4 +1,5 @@
 import { interval, Subject } from 'rxjs';
+// @ts-ignore
 import { Event } from '@cli-panel/panel';
 
 export class WebpackDataPlugin {
