@@ -10,7 +10,7 @@ import { Socket } from './socket';
 export class DataFacade {
 
   progress$: Observable<number> = this.socket.progress$
-    .pipe(map((payload: ProgressPayload) => payload.percentage) );
+    .pipe(map((payload: ProgressPayload) => payload.percentage * 100) );
 
   constructor(private socket: Socket) {
   }
