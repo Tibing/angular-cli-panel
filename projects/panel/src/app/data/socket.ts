@@ -1,7 +1,15 @@
 import { ApplicationRef, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-import { AssetsEvent, Event, EventBus, ModulesEvent, OperationEvent, StatusEvent } from '../event-bus';
+import {
+  AssetsEvent,
+  Event,
+  EventBus,
+  ModulesEvent,
+  OperationEvent,
+  ProgressPayload,
+  StatusPayload,
+} from '../event-bus';
 
 @Injectable()
 export class Socket {
@@ -9,14 +17,14 @@ export class Socket {
   private log = new Subject<string>();
   log$: Observable<string> = this.log.asObservable();
 
-  private status = new Subject<StatusEvent>();
-  status$: Observable<StatusEvent> = this.status.asObservable();
+  private status = new Subject<StatusPayload>();
+  status$: Observable<StatusPayload> = this.status.asObservable();
 
   private operation = new Subject<OperationEvent>();
   operation$: Observable<OperationEvent> = this.operation.asObservable();
 
-  private progress = new Subject<number>();
-  progress$: Observable<number> = this.progress.asObservable();
+  private progress = new Subject<ProgressPayload>();
+  progress$: Observable<ProgressPayload> = this.progress.asObservable();
 
   private modules = new Subject<ModulesEvent>();
   modules$: Observable<ModulesEvent> = this.modules.asObservable();
