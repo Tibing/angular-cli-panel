@@ -47,6 +47,9 @@ export class WebpackDataPlugin {
             percentage: 0,
           }
         },
+        {
+          type: 'clear',
+        }
       ]);
     });
 
@@ -64,6 +67,14 @@ export class WebpackDataPlugin {
         {
           type: 'stats',
           payload: stats.toJson(),
+        },
+        {
+          type: 'log',
+          value: stats.toString({
+            all: false,
+            errors: true,
+            warnings: true,
+          })
         },
         {
           type: 'status',
