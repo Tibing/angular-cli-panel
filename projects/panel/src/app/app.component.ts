@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DataFacade } from './data/data.facade';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'cp-root',
@@ -13,7 +14,7 @@ import { DataFacade } from './data/data.facade';
       label="Log"
       [style]="{ fg: -1, border: { fg: 'green' } }">
 
-      <log width="100%-5"></log>
+      <log [log]="log$ | async" width="100%-5"></log>
 
     </box>
 
@@ -26,7 +27,7 @@ import { DataFacade } from './data/data.facade';
 
       <box
         [label]="'Status'"
-        [content]="'{green-fg}{bold}Success{/}'"
+        [content]="status$ | async"
         width="100%"
         height="34%"
         valign="middle"
@@ -127,38 +128,23 @@ import { DataFacade } from './data/data.facade';
 export class AppComponent {
 
   progress$: Observable<number> = this.dataFacade.progress$;
+
+  log$: Observable<string> = this.dataFacade.log$;
+
+  status$: Observable<string> = this.dataFacade.status$.pipe(
+    map((status: string) => `{green-fg}{bold}${status}{/}`),
+  );
+
   modulesStyle = {
     fg: -1,
-    border: {
-      fg: 'green',
-    },
-    prefix: {
-      fg: -1,
-    },
-    item: {
-      fg: 'white',
-    },
-    selected: {
-      fg: 'black',
-      bg: 'green',
-    },
+    border: { fg: 'green' },
+    prefix: { fg: -1 },
+    item: { fg: 'white' },
+    selected: { fg: 'black', bg: 'green' },
   };
 
-  problemsStyle = {
-    border: {
-      fg: 'green',
-    },
-    prefix: {
-      fg: -1,
-    },
-    item: {
-      fg: 'white',
-    },
-    selected: {
-      fg: 'black',
-      bg: 'green',
-    },
-  };
+  problemsStyle = { border: { fg: 'green' }, prefix: { fg: -1 }, item: { fg: 'white' }, selected: { fg: 'black', bg: 'green' } };
+
   @ViewChild('status', { static: true }) status: ElementRef;
 
   constructor(private dataFacade: DataFacade) {

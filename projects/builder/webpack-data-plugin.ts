@@ -14,7 +14,7 @@ export class WebpackDataPlugin {
       this.sendData([
         {
           type: 'status',
-          payload: 'compiling'
+          payload: 'compiling',
         },
         {
           type: 'progress',
@@ -22,8 +22,8 @@ export class WebpackDataPlugin {
             percentage,
             msg,
             info: args,
-          }
-        }
+          },
+        },
       ]);
     })
       .apply(compiler);
@@ -31,7 +31,7 @@ export class WebpackDataPlugin {
     compiler.hooks.compile.tap('WebpackDataPlugin', () => {
       this.sendData([{
         type: 'status',
-        payload: 'compiling'
+        payload: 'compiling',
       }]);
     });
 
@@ -39,17 +39,17 @@ export class WebpackDataPlugin {
       this.sendData([
         {
           type: 'status',
-          payload: 'invalidated'
+          payload: 'invalidated',
         },
         {
           type: 'progress',
           payload: {
             percentage: 0,
-          }
+          },
         },
         {
           type: 'clear',
-        }
+        },
       ]);
     });
 
@@ -57,12 +57,14 @@ export class WebpackDataPlugin {
       this.sendData([
         {
           type: 'status',
-          payload: 'failed'
+          payload: 'failed',
         },
       ]);
     });
 
     compiler.hooks.done.tapAsync('WebpackDataPlugin', (stats) => {
+      const log = stats.toString({ all: true, errors: true, warnings: true });
+      require('fs').appendFileSync('log.txt', log);
       this.sendData([
         {
           type: 'stats',
@@ -70,11 +72,7 @@ export class WebpackDataPlugin {
         },
         {
           type: 'log',
-          value: stats.toString({
-            all: false,
-            errors: true,
-            warnings: true,
-          })
+          payload: log,
         },
         {
           type: 'status',
@@ -84,7 +82,7 @@ export class WebpackDataPlugin {
           type: 'progress',
           payload: {
             percentage: 1,
-          }
+          },
         },
       ]);
     });

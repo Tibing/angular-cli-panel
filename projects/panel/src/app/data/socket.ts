@@ -1,15 +1,7 @@
 import { ApplicationRef, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-import {
-  AssetsEvent,
-  Event,
-  EventBus,
-  ModulesEvent,
-  OperationEvent,
-  ProgressPayload,
-  StatusPayload,
-} from '../event-bus';
+import { AssetsEvent, Event, EventBus, ModulesEvent, OperationEvent, ProgressPayload, StatusPayload } from '../event-bus';
 
 @Injectable()
 export class Socket {
@@ -32,6 +24,9 @@ export class Socket {
   private assets = new Subject<AssetsEvent>();
   assets$: Observable<AssetsEvent> = this.assets.asObservable();
 
+  private stats = new Subject<AssetsEvent>();
+  stats$: Observable<AssetsEvent> = this.stats.asObservable();
+
   private handlers = {
     log: this.log.next.bind(this.log),
     status: this.status.next.bind(this.status),
@@ -39,6 +34,7 @@ export class Socket {
     progress: this.progress.next.bind(this.progress),
     modules: this.modules.next.bind(this.modules),
     assets: this.assets.next.bind(this.assets),
+    stats: this.stats.next.bind(this.stats),
 
     clear: () => this.log.next(''),
   };
@@ -52,6 +48,8 @@ export class Socket {
 
     if (handler) {
       handler(event.payload);
+    } else {
+      throw new Error(`No handler for event: ${event.type}`);
     }
 
     this.appRef.tick();
