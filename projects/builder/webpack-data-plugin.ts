@@ -64,7 +64,6 @@ export class WebpackDataPlugin {
 
     compiler.hooks.done.tapAsync('WebpackDataPlugin', (stats) => {
       const log = stats.toString({ all: true, errors: true, warnings: true });
-      require('fs').appendFileSync('log.txt', log);
       this.sendData([
         {
           type: 'stats',

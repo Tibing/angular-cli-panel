@@ -76,8 +76,8 @@ import { map } from 'rxjs/operators';
     >
 
       <table
-        height="100%-1"
-        width="100%-1"
+        height="100%-5"
+        width="100%-5"
         align="left"
         [data]="[['Name', 'Size', 'Percent']]"
       >
@@ -95,8 +95,8 @@ import { map } from 'rxjs/operators';
     >
 
       <table
-        height="100%-1"
-        width="100%-1"
+        height="100%-5"
+        width="100%-5"
         align="left"
         [data]="[['Name', 'Size']]"
       >
