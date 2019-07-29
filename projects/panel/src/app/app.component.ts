@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { DataFacade } from './data/data.facade';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { AssetsEvent } from './event-bus';
+
+import { DataFacade } from './data/data.facade';
+import { formatModules } from './util/format-modules';
 
 @Component({
   selector: 'cp-root',
@@ -74,13 +75,16 @@ import { AssetsEvent } from './event-bus';
       top="36%"
       [style]="modulesStyle"
       [autoCommandKeys]="true"
+      [commands]="commands$ | async"
     >
 
       <table
         height="100%-5"
         width="100%-5"
         align="left"
-        [data]="[['Name', 'Size', 'Percent']]"
+        [data]="modules$ | async"
+        top="1"
+        left="1"
       >
       </table>
 
@@ -89,7 +93,7 @@ import { AssetsEvent } from './event-bus';
     <box
       label="Assets"
       width="50%"
-      height="28%"
+      height="66%"
       left="50%"
       top="36%"
       [style]="{ fg: -1, border: { fg: 'green' } }"
@@ -98,31 +102,13 @@ import { AssetsEvent } from './event-bus';
       <table
         height="100%-5"
         width="100%-5"
+        top="1"
         align="left"
         [data]="assets$ | async"
       >
       </table>
 
     </box>
-
-    <listbar
-      label="Problems"
-      [mouse]="true"
-      width="50%"
-      height="38%"
-      left="50%"
-      top="63%"
-      [style]="problemsStyle"
-      [autoCommandKeys]="true"
-    >
-
-      <box
-        [border]="{fg:-1}"
-        [style]=" { fg: -1, border: { fg: 'green' } }"
-      >
-      </box>
-
-    </listbar>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -137,9 +123,8 @@ export class AppComponent {
   );
 
   assets$: Observable<any> = this.dataFacade.assets$.pipe(
-    startWith([['Name', 'Size']]),
+    startWith([['Waiting for the end of the compilation...']]),
   );
-
   modulesStyle = {
     fg: -1,
     border: { fg: 'green' },
@@ -147,10 +132,25 @@ export class AppComponent {
     item: { fg: 'white' },
     selected: { fg: 'black', bg: 'green' },
   };
-
-  problemsStyle = { border: { fg: 'green' }, prefix: { fg: -1 }, item: { fg: 'white' }, selected: { fg: 'black', bg: 'green' } };
-
-  @ViewChild('status', { static: true }) status: ElementRef;
+  private modules: Subject<any> = new Subject();
+  modules$: Observable<any> = this.modules.asObservable().pipe(
+    startWith([['Waiting for the end of the compilation...']]),
+  );
+  commands$: Observable<any> = this.dataFacade.sizes$.pipe(
+    map(sizes => sizes.value.assets),
+    map(assets => {
+      return Object.keys(assets).reduce(
+        (memo, name) =>
+          Object.assign({}, memo, {
+            [name]: () => {
+              this.modules.next(formatModules(assets[name].files));
+            },
+          }),
+        {},
+      );
+    }),
+    startWith([]),
+  );
 
   constructor(private dataFacade: DataFacade) {
   }

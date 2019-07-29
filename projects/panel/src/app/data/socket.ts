@@ -25,13 +25,17 @@ export class Socket {
   private stats = new Subject<any>();
   stats$: Observable<any> = this.stats.asObservable();
 
-  private sizes$: Observable<any> = this.stats$.pipe(
+  sizes$: Observable<any> = this.stats$.pipe(
     mergeMap(parseSizes),
   );
 
   assets$: Observable<any> = this.sizes$.pipe(
     map(sizes => sizes.value.assets),
     map(formatAssets),
+  );
+
+  modules$: Observable<any> = this.sizes$.pipe(
+    map(sizes => sizes.value.assets),
   );
 
   private problems$: Observable<any> = this.stats$.pipe(

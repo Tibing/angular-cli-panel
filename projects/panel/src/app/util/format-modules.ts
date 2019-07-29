@@ -8,25 +8,12 @@ const PERCENT_PRECISION = 3;
 // - existing source file name
 // - the path leading up to **just** the package (not including subpath).
 function _formatFileName(mod) {
-  const { fileName, baseName } = mod;
+  const { fileName } = mod;
 
+  const name = relative(process.cwd(), resolve(fileName));
+  const shortened = name.slice(name.length - 30);
   // Source file.
-  if (!baseName) {
-    return `{green-fg}.${sep}${relative(process.cwd(), resolve(fileName))}{/}`;
-  }
-
-  // Package
-  let parts = fileName.split(sep);
-  // Remove starting path.
-  const firstNmIdx = parts.indexOf('node_modules');
-  parts = parts.slice(firstNmIdx);
-
-  // Remove trailing path after package.
-  const lastNmIdx = parts.lastIndexOf('node_modules');
-  const isScoped = (parts[lastNmIdx + 1] || '').startsWith('@');
-  parts = parts.slice(0, lastNmIdx + (isScoped ? 3 : 2)); // eslint-disable-line no-magic-numbers
-
-  return parts.map(part => (part === 'node_modules' ? '~' : `{yellow-fg}${part}{/}`)).join(sep);
+  return `{green-fg}...${shortened}{/}`;
 }
 
 function _formatPercentage(modSize, assetSize) {

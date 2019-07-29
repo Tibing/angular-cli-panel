@@ -18,6 +18,8 @@ export class DataFacade {
 
   assets$: Observable<AssetsEvent> = this.socket.assets$;
 
+  sizes$: Observable<any> = this.socket.sizes$;
+
   constructor(private socket: Socket) {
   }
 }
