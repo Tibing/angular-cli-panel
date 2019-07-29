@@ -29,5 +29,8 @@
   "include": [
     "projects/builder/**/*.ts",
     "projects/builder/**/*.json"
+  ],
+  "exclude": [
+    "projects/builder/**/*.ext.json"
   ]
 }
