@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DataFacade } from './data/data.facade';
-import { map } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
+import { AssetsEvent } from './event-bus';
 
 @Component({
   selector: 'cp-root',
@@ -98,7 +99,7 @@ import { map } from 'rxjs/operators';
         height="100%-5"
         width="100%-5"
         align="left"
-        [data]="[['Name', 'Size']]"
+        [data]="assets$ | async"
       >
       </table>
 
@@ -133,6 +134,10 @@ export class AppComponent {
 
   status$: Observable<string> = this.dataFacade.status$.pipe(
     map((status: string) => `{green-fg}{bold}${status}{/}`),
+  );
+
+  assets$: Observable<any> = this.dataFacade.assets$.pipe(
+    startWith([['Name', 'Size']]),
   );
 
   modulesStyle = {

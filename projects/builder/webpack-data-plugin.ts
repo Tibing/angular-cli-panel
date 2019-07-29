@@ -64,6 +64,7 @@ export class WebpackDataPlugin {
 
     compiler.hooks.done.tapAsync('WebpackDataPlugin', (stats) => {
       const log = stats.toString({ all: true, errors: true, warnings: true });
+
       this.sendData([
         {
           type: 'stats',

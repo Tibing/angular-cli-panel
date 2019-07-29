@@ -1,7 +1,10 @@
 import { ApplicationRef, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-import { AssetsEvent, Event, EventBus, ModulesEvent, OperationEvent, ProgressPayload, StatusPayload } from '../event-bus';
+import { Event, EventBus, OperationEvent, ProgressPayload, StatusPayload } from '../event-bus';
+import { formatAssets } from '../util/format-assets';
+import { parseProblems, parseSizes } from './stats-parser';
+import { map, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class Socket {
@@ -18,22 +21,28 @@ export class Socket {
   private progress = new Subject<ProgressPayload>();
   progress$: Observable<ProgressPayload> = this.progress.asObservable();
 
-  private modules = new Subject<ModulesEvent>();
-  modules$: Observable<ModulesEvent> = this.modules.asObservable();
 
-  private assets = new Subject<AssetsEvent>();
-  assets$: Observable<AssetsEvent> = this.assets.asObservable();
+  private stats = new Subject<any>();
+  stats$: Observable<any> = this.stats.asObservable();
 
-  private stats = new Subject<AssetsEvent>();
-  stats$: Observable<AssetsEvent> = this.stats.asObservable();
+  private sizes$: Observable<any> = this.stats$.pipe(
+    mergeMap(parseSizes),
+  );
+
+  assets$: Observable<any> = this.sizes$.pipe(
+    map(sizes => sizes.value.assets),
+    map(formatAssets),
+  );
+
+  private problems$: Observable<any> = this.stats$.pipe(
+    mergeMap(parseProblems),
+  );
 
   private handlers = {
     log: this.log.next.bind(this.log),
     status: this.status.next.bind(this.status),
     operation: this.operation.next.bind(this.operation),
     progress: this.progress.next.bind(this.progress),
-    modules: this.modules.next.bind(this.modules),
-    assets: this.assets.next.bind(this.assets),
     stats: this.stats.next.bind(this.stats),
 
     clear: () => this.log.next(''),
