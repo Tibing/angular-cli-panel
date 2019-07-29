@@ -1,6 +1,13 @@
 {
   "name": "@cli-panel/builder",
-  "version": "0.0.1",
+  "scope": "@cli-panel",
+  "version": "0.0.2",
   "main": "index.js",
+  "description": "Angular CLI Panel",
+  "keywords": ["angular", "typescript", "rxjs", "webpack"],
+  "repository": "https://github.com/tibing/angular-cli-panel",
+  "author": "Nikita Poltoratsky",
+  "homepage": "https://github.com/tibing/angular-cli-panel",
+  "license": "MIT",
   "builders": "builders.json"
 }
