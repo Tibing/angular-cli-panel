@@ -9,70 +9,58 @@ import { formatModules } from './util/format-modules';
   selector: 'cp-root',
   template: `
     <box
-      width="75%"
-      height="36%"
-      left="0%"
-      top="0%"
+      [label]="'Status'"
+      [content]="status$ | async"
+      width="20%"
+      height="3"
+      [style]="{ fg: -1, border: { fg: 'green' } }">
+    </box>
+
+    <box
+      label="Operation"
+      [content]="'Idle'"
+      width="20%"
+      height="3"
+      left="20%"
+      [style]="{ fg: -1, border: { fg: 'green' } }">
+    </box>
+
+    <box
+      label="Progress"
+      width="60%"
+      height="3"
+      left="40%"
+      [style]="{ fg: -1, border: { fg: 'green' } }">
+
+      <progressbar
+        [value]="progress$ | async"
+        width="100%-4"
+        height="1"
+        top="center"
+        left="center"
+        orientation="horizontal"
+        [style]="{ bar: { bg: 'green'}}">
+      </progressbar>
+
+    </box>
+
+    <box
+      width="100%"
+      height="50%"
       label="Log"
+      top="3"
       [style]="{ fg: -1, border: { fg: 'green' } }">
 
       <log [log]="log$ | async" width="100%-5"></log>
 
     </box>
 
-    <layout
-      width="25%"
-      height="36%"
-      top="0%"
-      left="75%"
-      layout="grid">
-
-      <box
-        [label]="'Status'"
-        [content]="status$ | async"
-        width="100%"
-        height="34%"
-        valign="middle"
-        [style]="{ fg: -1, border: { fg: 'green' } }">
-      </box>
-
-      <box
-        label="Operation"
-        [content]="'Idle'"
-        width="100%"
-        height="34%"
-        valign="middle"
-        [style]="{ fg: -1, border: { fg: 'green' } }">
-      </box>
-
-      <box
-        label="Progress"
-        width="100%"
-        height="34%"
-        valign="middle"
-        [style]="{ fg: -1, border: { fg: 'green' } }">
-
-        <progressbar
-          [value]="progress$ | async"
-          width="90%"
-          height="1"
-          top="center"
-          left="center"
-          orientation="horizontal"
-          [style]="{ bar: { bg: 'green'}}">
-        </progressbar>
-
-      </box>
-
-    </layout>
-
     <listbar
       label="Modules"
       [mouse]="true"
       width="50%"
-      height="66%"
-      left="0%"
-      top="36%"
+      height="50%-3"
+      top="50%+3"
       [style]="modulesStyle"
       [autoCommandKeys]="true"
       [commands]="commands$ | async"
@@ -93,9 +81,9 @@ import { formatModules } from './util/format-modules';
     <box
       label="Assets"
       width="50%"
-      height="66%"
+      height="50%-3"
+      top="50%+3"
       left="50%"
-      top="36%"
       [style]="{ fg: -1, border: { fg: 'green' } }"
     >
 
