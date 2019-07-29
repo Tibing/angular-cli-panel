@@ -1,6 +1,6 @@
 {
   "name": "@cli-panel/panel",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "scope": "@cli-panel",
   "main": "./src/main.js",
   "description": "Angular CLI Panel",
@@ -20,9 +20,9 @@
     "@angular/common": "8.0.0"
   },
   "dependencies": {
-    "platform-terminal": "0.0.2",
+    "platform-terminal": "0.0.4",
     "blessed": "^0.1.81",
-    "core-js": "^2.5.7",
+    "core-js": "2.5.7",
     "filesize": "^4.1.2",
     "inspectpack": "^4.2.1"
   },
