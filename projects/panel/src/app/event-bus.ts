@@ -8,7 +8,14 @@ export interface Event<T = any> {
   payload: T;
 }
 
-export type StatusEvent = 'Errors';
+export interface ProgressPayload {
+  percentage: number;
+  message: string;
+  info?: string[]; // some additinal info
+}
+export type StatusPayload = 'compiling' | 'invalidated' | 'failed' | 'success';
+export type StatsPayload = any; //
+
 export type OperationEvent = 'idle';
 export type ModulesEvent = Module[];
 export type AssetsEvent = Asset[];

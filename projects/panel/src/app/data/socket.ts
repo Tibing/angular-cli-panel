@@ -1,7 +1,10 @@
 import { ApplicationRef, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-import { AssetsEvent, Event, EventBus, ModulesEvent, OperationEvent, StatusEvent } from '../event-bus';
+import { Event, EventBus, OperationEvent, ProgressPayload, StatusPayload } from '../event-bus';
+import { formatAssets } from '../util/format-assets';
+import { parseProblems, parseSizes } from './stats-parser';
+import { map, mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class Socket {
@@ -9,28 +12,42 @@ export class Socket {
   private log = new Subject<string>();
   log$: Observable<string> = this.log.asObservable();
 
-  private status = new Subject<StatusEvent>();
-  status$: Observable<StatusEvent> = this.status.asObservable();
+  private status = new Subject<StatusPayload>();
+  status$: Observable<StatusPayload> = this.status.asObservable();
 
   private operation = new Subject<OperationEvent>();
   operation$: Observable<OperationEvent> = this.operation.asObservable();
 
-  private progress = new Subject<number>();
-  progress$: Observable<number> = this.progress.asObservable();
+  private progress = new Subject<ProgressPayload>();
+  progress$: Observable<ProgressPayload> = this.progress.asObservable();
 
-  private modules = new Subject<ModulesEvent>();
-  modules$: Observable<ModulesEvent> = this.modules.asObservable();
 
-  private assets = new Subject<AssetsEvent>();
-  assets$: Observable<AssetsEvent> = this.assets.asObservable();
+  private stats = new Subject<any>();
+  stats$: Observable<any> = this.stats.asObservable();
+
+  sizes$: Observable<any> = this.stats$.pipe(
+    mergeMap(parseSizes),
+  );
+
+  assets$: Observable<any> = this.sizes$.pipe(
+    map(sizes => sizes.value.assets),
+    map(formatAssets),
+  );
+
+  modules$: Observable<any> = this.sizes$.pipe(
+    map(sizes => sizes.value.assets),
+  );
+
+  private problems$: Observable<any> = this.stats$.pipe(
+    mergeMap(parseProblems),
+  );
 
   private handlers = {
     log: this.log.next.bind(this.log),
     status: this.status.next.bind(this.status),
     operation: this.operation.next.bind(this.operation),
     progress: this.progress.next.bind(this.progress),
-    modules: this.modules.next.bind(this.modules),
-    assets: this.assets.next.bind(this.assets),
+    stats: this.stats.next.bind(this.stats),
 
     clear: () => this.log.next(''),
   };
@@ -44,6 +61,8 @@ export class Socket {
 
     if (handler) {
       handler(event.payload);
+    } else {
+      throw new Error(`No handler for event: ${event.type}`);
     }
 
     this.appRef.tick();
