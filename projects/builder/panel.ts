@@ -3,6 +3,7 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { BuilderContext } from '@angular-devkit/architect';
 import * as webpack from 'webpack';
 import { NEVER, Observable, Subject } from 'rxjs';
+// @ts-ignore
 import { bootstrapPanel, Event } from '@cli-panel/panel';
 
 import { WebpackDataPlugin } from './webpack-data-plugin';

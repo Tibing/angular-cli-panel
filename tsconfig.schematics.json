@@ -1,15 +1,14 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/builder",
-    "sourceMap": false,
-    "declaration": false,
+    "baseUrl": ".",
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
+    "outDir": "./dist/panel",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
@@ -18,19 +17,20 @@
     "noUnusedLocals": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
+    "sourceMap": false,
     "strictNullChecks": true,
+    "target": "es5",
     "resolveJsonModule": true,
-    "target": "es2015",
     "typeRoots": [
       "node_modules/@types"
-    ],
-    "lib": [
-      "es2018",
-      "dom"
     ]
   },
   "include": [
-    "projects/builder/**/*.ts",
-    "projects/builder/**/*.json"
+    "./projects/panel/package.json",
+    "./projects/panel/schematics/**/*.ts",
+    "./projects/panel/schematics/**/*.json"
+  ],
+  "exclude": [
+    "./projects/panel/schematics/**/files/**/*"
   ]
 }
