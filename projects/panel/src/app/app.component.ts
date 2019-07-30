@@ -5,6 +5,7 @@ import { map, startWith } from 'rxjs/operators';
 import { DataFacade } from './data/data.facade';
 import { formatModules } from './util/format-modules';
 import { StatusPayload } from './event-bus';
+import { commonStyleWithColor, modulesStyleWithColor, progressStyleWithColor, statusToColor } from './style-util';
 
 @Component({
   selector: 'cp-root',
@@ -41,8 +42,13 @@ import { StatusPayload } from './event-bus';
       </progressbar>
     </box>
 
-    <box width="100%" height="50%" label="Log" top="3" [style]="commonStyle$ | async">
-      <log left="1" width="100%-5" [log]="log$ | async"></log>
+    <box
+      width="100%"
+      height="50%"
+      label="Errors"
+      top="3"
+      [style]="commonStyle$ | async"
+      [content]="errors$ | async">
     </box>
 
     <listbar
@@ -76,12 +82,12 @@ import { StatusPayload } from './event-bus';
       <table height="100%-5" width="100%-5" top="1" align="left" [data]="assets$ | async"></table>
     </box>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   progress$: Observable<number> = this.dataFacade.progress$;
 
-  log$: Observable<string> = this.dataFacade.log$.pipe(
+  errors$: Observable<string> = this.dataFacade.errors$.pipe(
     startWith('Compiling...'),
   );
 
@@ -89,37 +95,37 @@ export class AppComponent {
 
   statusStyled$: Observable<string> = this.dataFacade.status$.pipe(
     map((status: StatusPayload) => {
-      const color = this.statusToColor(status);
+      const color = statusToColor(status);
       return `{${color}-fg}{bold}${status}{/}`;
-    })
+    }),
   );
 
   assets$: Observable<any> = this.dataFacade.assets$.pipe(
-    startWith([['Waiting for the end of the compilation...']])
+    startWith([['Waiting for the end of the compilation...']]),
   );
 
   commonStyle$: Observable<any> = this.status$.pipe(
     startWith('compiling'),
     map((status: StatusPayload) => {
-      const color = this.statusToColor(status);
-      return this.commonStyleWithColor(color);
-    })
+      const color = statusToColor(status);
+      return commonStyleWithColor(color);
+    }),
   );
 
   modulesStyle$: Observable<any> = this.status$.pipe(
     startWith('compiling'),
     map((status: StatusPayload) => {
-      const color = this.statusToColor(status);
-      return this.modulesStyleWithColor(color);
-    })
+      const color = statusToColor(status);
+      return modulesStyleWithColor(color);
+    }),
   );
 
   progressBarStyle$: Observable<any> = this.status$.pipe(
     startWith('compiling'),
     map((status: StatusPayload) => {
-      const color = this.statusToColor(status);
-      return this.progressStyleWithColor(color);
-    })
+      const color = statusToColor(status);
+      return progressStyleWithColor(color);
+    }),
   );
 
   modules: Subject<any> = new Subject();
@@ -134,54 +140,14 @@ export class AppComponent {
           Object.assign({}, memo, {
             [name]: () => {
               this.modules.next(formatModules(assets[name].files));
-            }
+            },
           }),
-        {}
+        {},
       );
     }),
-    startWith([])
+    startWith([]),
   );
 
-  constructor(private dataFacade: DataFacade) {}
-
-  private commonStyleWithColor(color: string = 'white') {
-    return { fg: -1, border: { fg: color } };
-  }
-
-  private progressStyleWithColor(color: string = 'white') {
-    return { bar: { bg: color } };
-  }
-
-  private modulesStyleWithColor(color: string = 'white') {
-    return {
-      fg: -1,
-      border: { fg: color },
-      prefix: { fg: -1 },
-      item: { fg: 'white' },
-      selected: { fg: 'black', bg: color }
-    };
-  }
-
-  private statusToColor(status: StatusPayload): string {
-    const defaultColor = 'white';
-    let color = defaultColor;
-
-    if (status === 'compiling') {
-      color = defaultColor;
-    }
-
-    if (status === 'invalidated') {
-      color = defaultColor;
-    }
-
-    if (status === 'success') {
-      color = 'green';
-    }
-
-    if (status === 'failed') {
-      color = 'red';
-    }
-
-    return color;
+  constructor(private dataFacade: DataFacade) {
   }
 }

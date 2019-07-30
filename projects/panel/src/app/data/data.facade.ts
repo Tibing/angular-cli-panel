@@ -12,7 +12,7 @@ export class DataFacade {
   progress$: Observable<number> = this.socket.progress$
     .pipe(map((payload: ProgressPayload) => payload.percentage * 100));
 
-  log$: Observable<string> = this.socket.log$;
+  errors$: Observable<string> = this.socket.errors$;
 
   status$: Observable<string> = this.socket.status$;
 

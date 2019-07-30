@@ -9,8 +9,10 @@ import { parseProblems, parseSizes } from './stats-parser';
 @Injectable()
 export class Socket {
 
-  private log = new Subject<string>();
-  log$: Observable<string> = this.log.asObservable();
+  private errors = new Subject<string>();
+  errors$: Observable<string> = this.errors.asObservable().pipe(
+    map(errors => errors || `No errors! You're awesome!`),
+  );
 
 
   private operation = new Subject<OperationEvent>();
@@ -28,7 +30,7 @@ export class Socket {
   );
 
   private hasErrors$: Observable<boolean> = this.stats$.pipe(
-    map(data => data.errors),
+    map(data => data.errors && data.errors.length),
   );
 
   private status = new Subject<StatusPayload>();
@@ -60,13 +62,13 @@ export class Socket {
   );
 
   private handlers = {
-    log: this.log.next.bind(this.log),
+    log: this.errors.next.bind(this.errors),
     status: this.status.next.bind(this.status),
     operation: this.operation.next.bind(this.operation),
     progress: this.progress.next.bind(this.progress),
     stats: this.stats.next.bind(this.stats),
 
-    clear: () => this.log.next(''),
+    clear: () => this.errors.next(''),
   };
 
   constructor(eventBus: EventBus, private appRef: ApplicationRef) {
