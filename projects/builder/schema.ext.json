@@ -4,6 +4,19 @@
       "type": "boolean",
       "description": "Disables CLI Panel and shows raw log.",
       "default": false
+    },
+    "port": {
+      "type": "number",
+      "description": "Port to setup websocket."
+    },
+    "mode": {
+      "type": "string",
+      "description": "Builder execution mode.",
+      "default": "panel",
+      "enum": [
+        "panel",
+        "builder"
+      ]
     }
   }
 }

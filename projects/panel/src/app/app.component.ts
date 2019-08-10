@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { interval, NEVER, Observable, Subject } from 'rxjs';
+import { map, startWith, switchMap, tap, throttleTime } from 'rxjs/operators';
 
 import { DataFacade } from './data/data.facade';
 import { formatModules } from './util/format-modules';
@@ -13,7 +13,7 @@ import { commonStyleWithColor, modulesStyleWithColor, progressStyleWithColor, st
     <box
       [label]="'Status'"
       [content]="statusStyled$ | async"
-      width="20%"
+      width="15%"
       height="3"
       [style]="commonStyle$ | async"
     >
@@ -21,21 +21,24 @@ import { commonStyleWithColor, modulesStyleWithColor, progressStyleWithColor, st
 
     <box
       label="Operation"
-      [content]="'Idle'"
-      width="20%"
+      [content]="operation$ | async"
+      width="15%"
       height="3"
-      left="20%"
+      left="15%"
       [style]="commonStyle$ | async"
     >
     </box>
 
-    <box label="Progress" width="60%" height="3" left="40%" [style]="commonStyle$ | async">
+    <box label="Progress" width="70%" height="3" left="30%" [style]="commonStyle$ | async">
+
+      {{ loader$ | async }}
+
       <progressbar
         [value]="progress$ | async"
-        width="100%-4"
+        width="100%-5"
         height="1"
         top="center"
-        left="center"
+        left="3"
         orientation="horizontal"
         [style]="progressBarStyle$ | async"
       >
@@ -85,7 +88,9 @@ import { commonStyleWithColor, modulesStyleWithColor, progressStyleWithColor, st
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  progress$: Observable<number> = this.dataFacade.progress$;
+  progress$: Observable<number> = this.dataFacade.progress$.pipe(
+    throttleTime(200),
+  );
 
   errors$: Observable<string> = this.dataFacade.errors$.pipe(
     startWith('Compiling...'),
@@ -93,7 +98,12 @@ export class AppComponent {
 
   status$: Observable<string> = this.dataFacade.status$;
 
+  operation$: Observable<string> = this.dataFacade.operation$.pipe(
+    startWith('idle'),
+  );
+
   statusStyled$: Observable<string> = this.dataFacade.status$.pipe(
+    startWith('compiling'),
     map((status: StatusPayload) => {
       const color = statusToColor(status);
       return `{${color}-fg}{bold}${status}{/}`;
@@ -135,7 +145,10 @@ export class AppComponent {
   commands$: Observable<any> = this.dataFacade.sizes$.pipe(
     map(sizes => sizes.value.assets),
     map(assets => {
-      return Object.keys(assets).reduce(
+      const names: string[] = Object.keys(assets);
+      const [active] = names;
+      this.modules.next(formatModules(assets[active].files));
+      return names.reduce(
         (memo, name) =>
           Object.assign({}, memo, {
             [name]: () => {
@@ -146,6 +159,23 @@ export class AppComponent {
       );
     }),
     startWith([]),
+  );
+
+  private loaderChunks = ['\\', '|', '/', '-'];
+
+  private loader$$: Observable<string> = interval(100).pipe(
+    map(i => this.loaderChunks[i % this.loaderChunks.length]),
+  );
+
+  loader$: Observable<string> = this.status$.pipe(
+    startWith('compiling'),
+    switchMap((status: StatusPayload) => {
+      if (status === 'failed' || status === 'success') {
+        return NEVER;
+      }
+
+      return this.loader$$;
+    }),
   );
 
   constructor(private dataFacade: DataFacade) {

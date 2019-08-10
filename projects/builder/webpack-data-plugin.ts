@@ -1,9 +1,11 @@
-import { Subject } from 'rxjs';
 import { ProgressPlugin } from 'webpack';
+import { Subject } from 'rxjs';
 
 import { Event } from '@cli-panel/panel';
 
 export class WebpackDataPlugin {
+
+  private timer = Date.now();
 
   constructor(private eventBus: Subject<Event>) {
   }
@@ -23,6 +25,10 @@ export class WebpackDataPlugin {
             msg,
             info: args,
           },
+        },
+        {
+          type: 'operation',
+          payload: msg + this.getTimeMessage(this.timer),
         },
       ]);
     })
@@ -50,6 +56,10 @@ export class WebpackDataPlugin {
         {
           type: 'clear',
         },
+        {
+          type: 'operation',
+          payload: 'idle',
+        },
       ]);
     });
 
@@ -58,6 +68,10 @@ export class WebpackDataPlugin {
         {
           type: 'status',
           payload: 'failed',
+        },
+        {
+          type: 'operation',
+          payload: `idle${this.getTimeMessage(this.timer)}`,
         },
       ]);
     });
@@ -84,14 +98,35 @@ export class WebpackDataPlugin {
             percentage: 1,
           },
         },
+        {
+          type: 'operation',
+          payload: `idle${this.getTimeMessage(this.timer)}`,
+        },
       ]);
     });
   }
 
 
-  sendData(eventList: Event[]) {
+  private sendData(eventList: Event[]) {
     for (const event of eventList) {
       this.eventBus.next(event);
     }
+  }
+
+  private getTimeMessage(timer) {
+    const ONE_SECOND = 1000;
+    let time = Date.now() - timer;
+
+    if (time >= ONE_SECOND) {
+      time /= ONE_SECOND;
+      time = Math.round(time);
+      // @ts-ignore
+      time += 's';
+    } else {
+      // @ts-ignore
+      time += 'ms';
+    }
+
+    return ` (${time})`;
   }
 }

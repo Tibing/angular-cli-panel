@@ -1,6 +1,6 @@
 import { ApplicationRef, Injectable } from '@angular/core';
 import { combineLatest, Observable, Subject } from 'rxjs';
-import { map, mergeMap, startWith } from 'rxjs/operators';
+import { map, mergeMap, startWith, tap } from 'rxjs/operators';
 
 import { Event, EventBus, OperationEvent, ProgressPayload, StatusPayload } from '../event-bus';
 import { formatAssets } from '../util/format-assets';
@@ -13,26 +13,25 @@ export class Socket {
   errors$: Observable<string> = this.errors.asObservable().pipe(
     map(errors => errors || `No errors! You're awesome!`),
   );
-
-
   private operation = new Subject<OperationEvent>();
   operation$: Observable<OperationEvent> = this.operation.asObservable();
-
   private progress = new Subject<ProgressPayload>();
   progress$: Observable<ProgressPayload> = this.progress.asObservable();
-
-
   private stats = new Subject<any>();
   stats$: Observable<any> = this.stats.asObservable();
-
   sizes$: Observable<any> = this.stats$.pipe(
     mergeMap(parseSizes),
   );
-
+  assets$: Observable<any> = this.sizes$.pipe(
+    map(sizes => sizes.value.assets),
+    map(formatAssets),
+  );
+  modules$: Observable<any> = this.sizes$.pipe(
+    map(sizes => sizes.value.assets),
+  );
   private hasErrors$: Observable<boolean> = this.stats$.pipe(
     map(data => data.errors && data.errors.length),
   );
-
   private status = new Subject<StatusPayload>();
   status$: Observable<StatusPayload> = combineLatest([
     this.status.asObservable(),
@@ -47,16 +46,6 @@ export class Socket {
         }
       }),
     );
-
-  assets$: Observable<any> = this.sizes$.pipe(
-    map(sizes => sizes.value.assets),
-    map(formatAssets),
-  );
-
-  modules$: Observable<any> = this.sizes$.pipe(
-    map(sizes => sizes.value.assets),
-  );
-
   private problems$: Observable<any> = this.stats$.pipe(
     mergeMap(parseProblems),
   );

@@ -1,64 +1,61 @@
-import { ExecutionTransformer } from '@angular-devkit/build-angular';
-import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { BuilderContext } from '@angular-devkit/architect';
-import * as webpack from 'webpack';
-import { NEVER, Observable, Subject } from 'rxjs';
-// @ts-ignore
+import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { from, NEVER, Observable, Observer, of } from 'rxjs';
 import { bootstrapPanel, Event } from '@cli-panel/panel';
+import * as io from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { catchError, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import * as portfinder from 'portfinder';
 
-import { WebpackDataPlugin } from './webpack-data-plugin';
-import { CliPanelBuilderSchema } from './schema';
+import { CliPanelBuilderSchema, ExecutionMode } from './schema';
+import { Builder, BuilderTransforms } from './model';
+import { executeBuilder } from './builder';
+import { spawn } from './fs-util';
 
-interface BuilderTransforms {
-  webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
-  logging?: WebpackLoggingCallback;
-}
-
-type Builder<T extends CliPanelBuilderSchema, R>
-  = (options: T, context: BuilderContext, transforms?: BuilderTransforms) => Observable<R>;
-
-export function withPanel<T extends CliPanelBuilderSchema, R>(builder: Builder<T, R>): Builder<T, R> {
+export function withPanel<T extends CliPanelBuilderSchema, R extends BuilderOutput>(builder: Builder<T, R>): Builder<T, R> {
   return (options: T, context: BuilderContext, transforms?: BuilderTransforms): Observable<R> => {
+
+    if (options.mode === ExecutionMode.BUILDER) {
+      return executeBuilder(builder, options as any, context, transforms) as any;
+    }
 
     if (options.raw) {
       return builder(options, context, transforms);
     }
 
-    return executeBuilderWithPanel(builder, options, context, transforms);
+    return executeBuilderWithPanel() as any;
   };
 }
 
-function executeBuilderWithPanel<T extends CliPanelBuilderSchema, R>(
-  builder: Builder<T, R>, rawOptions: T, context: BuilderContext,
-  rawTransforms?: BuilderTransforms): Observable<R> {
+function executeBuilderWithPanel(): Observable<BuilderOutput> {
 
-  const eventBus = new Subject<Event>();
-  bootstrapPanel(eventBus.asObservable());
+  return choosePort().pipe(
+    tap(runBuilder),
+    map(createEventBus),
+    mergeMap(bootstrapPanel),
+    map(() => ({ success: true })),
+    catchError(() => of({ success: false })),
+    switchMap(() => NEVER),
+  );
+}
 
-  const options = { ...rawOptions, progress: false };
-  const transforms = {
-    ...rawTransforms,
-    webpackConfiguration: webpackConfigTransformer(eventBus),
-    logging: noop,
-  };
+function choosePort(): Observable<number> {
+  return from<Promise<number>>(portfinder.getPortPromise());
+}
 
-  builder(options, context, transforms)
+function createEventBus(port: number): Observable<Event> {
+  return new Observable((observer: Observer<void>) => {
+    const server: Server = io(port);
+
+    server.on('error', err => observer.error(err));
+    server.on('connection', (socket: Socket) => {
+      socket.on('message', (msg) => observer.next(msg));
+      socket.on('disconnect', () => observer.complete());
+    });
+  });
+}
+
+function runBuilder(port: number) {
+  const [procPath, ...args] = process.argv;
+  spawn(procPath, [...args, `--mode=builder`, `--port=${port}`])
     .subscribe();
-
-  return NEVER;
-}
-
-function webpackConfigTransformer(eventBus: Subject<Event>): ExecutionTransformer<webpack.Configuration> {
-  return (config: webpack.Configuration) => {
-    return {
-      ...config,
-      plugins: [
-        ...config.plugins,
-        new WebpackDataPlugin(eventBus),
-      ],
-    };
-  };
-}
-
-function noop() {
 }

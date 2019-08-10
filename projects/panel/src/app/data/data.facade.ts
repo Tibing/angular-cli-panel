@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { AssetsEvent, ProgressPayload } from '../event-bus';
 
@@ -15,6 +15,8 @@ export class DataFacade {
   errors$: Observable<string> = this.socket.errors$;
 
   status$: Observable<string> = this.socket.status$;
+
+  operation$: Observable<string> = this.socket.operation$;
 
   assets$: Observable<AssetsEvent> = this.socket.assets$;
 
