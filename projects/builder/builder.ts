@@ -46,8 +46,39 @@ function webpackConfigTransformer(eventBus: Subject<Event>): ExecutionTransforme
 }
 
 function createEventBus(port: number): Subject<Event> {
-  const socket: Socket = io(`http://localhost:${port}`);
+  log('[SENDING ON PORT]', port);
+  const socket: Socket = io(`http://localhost:${port}`, { transports: ['websocket'] });
+  socket.on('connect', () => {
+    log('[CONNECT]');
+  });
+  socket.on('error', (err: Error) => {
+    log('[SOCKET ERROR]', err.name, err.message, err.stack);
+    process.exit(1);
+  });
+  socket.on('disconnect', (msg) => {
+    log('[DISCONNECT]', msg);
+    process.exit(1);
+  });
   const s = new Subject<Event>();
-  s.subscribe((event) => socket.emit('message', event));
+  s.subscribe({
+    next: (event) => {
+      socket.emit('message', event);
+    },
+    complete: () => {
+      log('[PLUGIN CLOSE]');
+      // @ts-ignore
+      socket.close();
+    },
+    // @ts-ignore
+    error: () => {
+      log('[PLUGIN ERROR]');
+      // @ts-ignore
+      socket.close();
+    },
+  });
   return s;
+}
+
+export function log(...msg: any[]) {
+  require('fs').appendFileSync('log.txt', `${JSON.stringify(msg)}\n`);
 }

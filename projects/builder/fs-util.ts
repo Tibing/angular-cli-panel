@@ -7,9 +7,18 @@ export const spawn = (path: string, args: string[]) => {
     const proc: ChildProcess = spawnNode(path, args);
 
     proc.stdout.on('data', msg => observer.next(msg.toString()));
-    proc.on('close', () => observer.complete());
-    proc.on('exit', () => observer.complete());
-    proc.on('error', err => observer.error(err));
+    proc.on('close', (err) => {
+      console.error(err);
+      process.exit(1);
+    });
+    proc.on('exit', (err) => {
+      console.error(err);
+      process.exit(1);
+    });
+    proc.on('error', err => {
+      observer.error(err);
+      process.exit(1);
+    });
 
     process.on('exit', () => proc.kill());
   });
