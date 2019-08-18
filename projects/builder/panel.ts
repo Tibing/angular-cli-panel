@@ -43,22 +43,19 @@ function choosePort(): Observable<number> {
 }
 
 function createEventBus(port: number): Observable<Event> {
-  log('[LISTEN ON PORT]', port);
   return new Observable((observer: Observer<void>) => {
     const server: Server = io(port);
 
     server.on('error', err => {
-      log('[SERVER ERROR]', err);
       observer.error(err);
     });
     server.on('connect', (socket: Socket) => {
-      log('[SERVER CONNECTION]');
       socket.on('message', (msg) => {
         log('[SERVER MESSAGE]', msg);
         observer.next(msg);
       });
-      socket.on('disconnect', (msg) => {
-        log('[SERVER DISCONNECT]', msg);
+      socket.on('disconnect', (reason) => {
+        log('[SERVER DISCONNECT]', reason);
         observer.complete();
       });
     });

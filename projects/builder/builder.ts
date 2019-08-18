@@ -1,6 +1,6 @@
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { createBrowserLoggingCallback } from '@angular-devkit/build-angular/src/browser';
-import { Observable, Subject } from 'rxjs';
+import { NEVER, Observable, Subject } from 'rxjs';
 import { ExecutionTransformer } from '@angular-devkit/build-angular';
 import { Socket } from 'socket.io';
 import * as webpack from 'webpack';
@@ -21,7 +21,9 @@ export function executeBuilder<T extends CliPanelBuilderSchema, R extends Builde
   const transforms = createTransforms(eventBus, options, context, rawTransforms);
 
   // @ts-ignore
-  return builder(options, context, transforms);
+  builder(options, context, transforms).subscribe();
+
+  return NEVER;
 }
 
 function createTransforms(
@@ -70,8 +72,8 @@ function createEventBus(port: number): Subject<Event> {
       socket.close();
     },
     // @ts-ignore
-    error: () => {
-      log('[PLUGIN ERROR]');
+    error: (err) => {
+      log('[PLUGIN ERROR]', err);
       // @ts-ignore
       socket.close();
     },
@@ -79,6 +81,9 @@ function createEventBus(port: number): Subject<Event> {
   return s;
 }
 
+// @ts-ignore
 export function log(...msg: any[]) {
-  require('fs').appendFileSync('log.txt', `${JSON.stringify(msg)}\n`);
+  if (process.env.TRACE) {
+    require('fs').appendFileSync('log.txt', `${JSON.stringify(msg)}\n`);
+  }
 }
