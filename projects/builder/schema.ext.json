@@ -5,7 +5,7 @@
       "description": "Disables CLI Panel and shows raw log.",
       "default": false
     },
-    "port": {
+    "ebport": {
       "type": "number",
       "description": "Port to setup websocket."
     },

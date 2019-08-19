@@ -64,6 +64,6 @@ function createEventBus(port: number): Observable<Event> {
 
 function runBuilder(port: number) {
   const [procPath, ...args] = process.argv;
-  spawn(procPath, [...args, `--mode=builder`, `--port=${port}`])
+  spawn(procPath, [...args, `--mode=builder`, `--ebport=${port}`])
     .subscribe();
 }

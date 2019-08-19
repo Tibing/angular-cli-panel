@@ -1,6 +1,7 @@
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { createBrowserLoggingCallback } from '@angular-devkit/build-angular/src/browser';
-import { NEVER, Observable, Subject } from 'rxjs';
+import { NEVER, Observable, of, Subject } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ExecutionTransformer } from '@angular-devkit/build-angular';
 import { Socket } from 'socket.io';
 import * as webpack from 'webpack';
@@ -17,13 +18,21 @@ export function executeBuilder<T extends CliPanelBuilderSchema, R extends Builde
   context: BuilderContext,
   rawTransforms?: BuilderTransforms,
 ): Observable<R> {
-  const eventBus = createEventBus(options.port);
+  const eventBus = createEventBus(options.ebport);
   const transforms = createTransforms(eventBus, options, context, rawTransforms);
 
   // @ts-ignore
-  builder(options, context, transforms).subscribe();
-
-  return NEVER;
+  return builder(options, context, transforms).pipe(
+    map(() => {
+      log('[BDDD] success');
+      return ({ success: true });
+    }),
+    catchError((err) => {
+      log('[BDDD] fail', err);
+      return of({ success: false });
+    }),
+    switchMap(() => NEVER),
+  );
 }
 
 function createTransforms(

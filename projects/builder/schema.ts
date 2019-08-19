@@ -5,6 +5,6 @@ export enum ExecutionMode {
 
 export interface CliPanelBuilderSchema {
   raw: boolean;
-  port: number;
+  ebport: number;
   mode: ExecutionMode;
 }
