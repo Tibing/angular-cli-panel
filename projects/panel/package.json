@@ -1,6 +1,6 @@
 {
   "name": "@cli-panel/panel",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scope": "@cli-panel",
   "main": "./src/main.js",
   "description": "Angular CLI Panel",

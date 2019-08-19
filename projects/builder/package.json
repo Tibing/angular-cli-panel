@@ -1,7 +1,7 @@
 {
   "name": "@cli-panel/builder",
   "scope": "@cli-panel",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "index.js",
   "description": "Angular CLI Panel",
   "keywords": ["angular", "typescript", "rxjs", "webpack"],
